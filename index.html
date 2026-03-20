@@ -201,6 +201,11 @@
             color: white;
         }
 
+        .btn-next {
+            background: var(--aws-gray);
+            color: white;
+        }
+
         .domain-selector {
             background: var(--aws-dark);
             padding: 20px;
@@ -600,6 +605,7 @@
                 </div>
                 <div class="card-actions">
                     <button class="btn btn-review" id="review-btn">Review Again</button>
+                    <button class="btn btn-next" id="next-btn">Next →</button>
                     <button class="btn btn-know" id="know-btn">I Know This</button>
                 </div>
                 <div style="text-align: center; margin-top: 20px;">
@@ -930,6 +936,16 @@
             showCard();
         }
 
+        function nextCard() {
+            // Move to next card without marking status
+            const domainCards = flashcards.filter(c => c.domain === currentDomain);
+            currentCardIndex++;
+            if (currentCardIndex >= domainCards.length) {
+                currentCardIndex = 0;
+            }
+            showCard();
+        }
+
         function updateStats() {
             // Learn view stats
             document.getElementById('total-topics').textContent = topics.length;
@@ -1068,6 +1084,7 @@
 
         document.getElementById('flashcard').addEventListener('click', flipCard);
         document.getElementById('review-btn').addEventListener('click', () => markCard('review'));
+        document.getElementById('next-btn').addEventListener('click', nextCard);
         document.getElementById('know-btn').addEventListener('click', () => markCard('known'));
         document.getElementById('mark-read-btn').addEventListener('click', markTopicRead);
 
