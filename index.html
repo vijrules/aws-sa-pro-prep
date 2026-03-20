@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#232F3E">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>AWS SA Pro Prep</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="aws-content.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --aws-orange: #FF9900;
+            --aws-dark: #232F3E;
+            --aws-darker: #161E2D;
+            --aws-light: #FFFFFF;
+            --aws-gray: #687078;
+            --success: #1D8102;
+            --review: #EC7211;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--aws-darker);
+            color: var(--aws-light);
+            min-height: 100vh;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--aws-dark);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--aws-orange);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            color: var(--aws-orange);
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: var(--aws-gray);
+            font-size: 0.9rem;
+        }
+
+        .nav {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .nav-btn {
+            background: var(--aws-dark);
+            border: 2px solid var(--aws-orange);
+            color: var(--aws-light);
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:active, .nav-btn.active {
+            background: var(--aws-orange);
+            transform: scale(0.95);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: var(--aws-dark);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--aws-orange);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--aws-gray);
+            margin-top: 5px;
+        }
+
+        .flashcard-container {
+            perspective: 1000px;
+            margin: 20px 0;
+            min-height: 300px;
+        }
+
+        .flashcard {
+            position: relative;
+            width: 100%;
+            min-height: 300px;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            min-height: 300px;
+            background: var(--aws-dark);
+            border: 2px solid var(--aws-orange);
+            border-radius: 12px;
+            padding: 30px;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card-front {
+            color: var(--aws-light);
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: var(--aws-darker);
+        }
+
+        .card-label {
+            color: var(--aws-orange);
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .card-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-review {
+            background: var(--review);
+            color: white;
+        }
+
+        .btn-know {
+            background: var(--success);
+            color: white;
+        }
+
+        .domain-selector {
+            background: var(--aws-dark);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .domain-item {
+            background: var(--aws-darker);
+            border: 2px solid var(--aws-gray);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .domain-item:active {
+            transform: scale(0.98);
+            border-color: var(--aws-orange);
+        }
+
+        .domain-title {
+            font-weight: bold;
+            color: var(--aws-orange);
+            margin-bottom: 5px;
+        }
+
+        .domain-weight {
+            color: var(--aws-gray);
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--aws-gray);
+        }
+
+        .empty-state h3 {
+            color: var(--aws-light);
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--aws-dark);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--aws-orange);
+            transition: width 0.3s;
+        }
+
+        .admin-section {
+            background: var(--aws-dark);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--aws-orange);
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: var(--aws-darker);
+            border: 2px solid var(--aws-gray);
+            border-radius: 8px;
+            color: var(--aws-light);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn-primary {
+            background: var(--aws-orange);
+            color: var(--aws-dark);
+        }
+
+        .card-list {
+            margin-top: 20px;
+        }
+
+        .card-item {
+            background: var(--aws-darker);
+            border: 1px solid var(--aws-gray);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-item-content {
+            flex: 1;
+        }
+
+        .card-item-title {
+            color: var(--aws-orange);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .card-item-domain {
+            color: var(--aws-gray);
+            font-size: 0.9rem;
+        }
+
+        .btn-delete {
+            background: #D13212;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .topic-card {
+            background: var(--aws-dark);
+            border: 2px solid var(--aws-gray);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .topic-card:active {
+            transform: scale(0.98);
+            border-color: var(--aws-orange);
+        }
+
+        .topic-card.read {
+            border-color: var(--success);
+            background: linear-gradient(135deg, var(--aws-dark) 0%, rgba(29, 129, 2, 0.1) 100%);
+        }
+
+        .topic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .topic-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--aws-orange);
+        }
+
+        .topic-badge {
+            background: var(--aws-darker);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--aws-gray);
+        }
+
+        .topic-badge.read {
+            background: var(--success);
+            color: white;
+        }
+
+        .topic-summary {
+            color: var(--aws-light);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .topic-detail {
+            background: var(--aws-darker);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .topic-content {
+            line-height: 1.8;
+            color: var(--aws-light);
+            margin: 15px 0;
+        }
+
+        .topic-content h4 {
+            color: var(--aws-orange);
+            margin: 20px 0 10px 0;
+        }
+
+        .topic-content ul {
+            margin: 10px 0 10px 20px;
+        }
+
+        .topic-content li {
+            margin: 8px 0;
+        }
+
+        .topic-links {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--aws-gray);
+        }
+
+        .topic-link {
+            display: block;
+            color: var(--aws-orange);
+            text-decoration: none;
+            padding: 8px 0;
+            transition: all 0.3s;
+        }
+
+        .topic-link:hover {
+            padding-left: 10px;
+        }
+
+        .back-btn {
+            background: var(--aws-gray);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:active {
+            transform: scale(0.95);
+        }
+
+        .mark-read-btn {
+            background: var(--success);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        @media (prefers-color-scheme: light) {
+            /* Keep dark theme always */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>AWS Solutions Architect Pro</h1>
+        <p class="subtitle">Certification Prep</p>
+    </header>
+
+    <div class="container">
+        <div class="nav">
+            <button class="nav-btn active" data-view="learn">Learn</button>
+            <button class="nav-btn" data-view="review">Review</button>
+            <button class="nav-btn" data-view="progress">Progress</button>
+            <button class="nav-btn" data-view="admin">Manage</button>
+        </div>
+
+        <!-- Learn View -->
+        <div id="learn-view" class="view">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-topics">0</div>
+                    <div class="stat-label">Topics</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="read-topics">0</div>
+                    <div class="stat-label">Read</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-cards">0</div>
+                    <div class="stat-label">Cards</div>
+                </div>
+            </div>
+
+            <div id="topic-list-view">
+                <div class="domain-selector">
+                    <h3 style="margin-bottom: 15px;">Select Domain to Learn</h3>
+                    <div class="domain-item" data-domain="organizational" data-action="learn">
+                        <div class="domain-title">1. Design for Organizational Complexity</div>
+                        <div class="domain-weight">26% of exam</div>
+                    </div>
+                    <div class="domain-item" data-domain="new-solutions" data-action="learn">
+                        <div class="domain-title">2. Design for New Solutions</div>
+                        <div class="domain-weight">29% of exam</div>
+                    </div>
+                    <div class="domain-item" data-domain="improvement" data-action="learn">
+                        <div class="domain-title">3. Continuous Improvement</div>
+                        <div class="domain-weight">25% of exam</div>
+                    </div>
+                    <div class="domain-item" data-domain="migration" data-action="learn">
+                        <div class="domain-title">4. Migration & Modernization</div>
+                        <div class="domain-weight">20% of exam</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="domain-topics-view" class="hidden">
+                <button class="back-btn" onclick="backToTopicList()">← Back to Domains</button>
+                <h3 id="domain-topics-title" style="color: var(--aws-orange); margin-bottom: 20px;"></h3>
+                <div id="topics-container"></div>
+                <div id="no-topics-msg" class="empty-state hidden">
+                    <h3>No topics yet!</h3>
+                    <p>Add learning topics using the "Manage" tab.</p>
+                </div>
+            </div>
+
+            <div id="topic-detail-view" class="hidden">
+                <button class="back-btn" onclick="backToDomainTopics()">← Back to Topics</button>
+                <div class="topic-detail">
+                    <h2 id="detail-title" style="color: var(--aws-orange); margin-bottom: 20px;"></h2>
+                    <div id="detail-content" class="topic-content"></div>
+                    <div id="detail-links" class="topic-links"></div>
+                    <button class="mark-read-btn" id="mark-read-btn">Mark as Read</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review View -->
+        <div id="review-view" class="view hidden">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="review-total-cards">0</div>
+                    <div class="stat-label">Total Cards</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="known-cards">0</div>
+                    <div class="stat-label">Known</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="review-cards">0</div>
+                    <div class="stat-label">Review</div>
+                </div>
+            </div>
+
+            <div id="domain-selector" class="domain-selector">
+                <h3 style="margin-bottom: 15px;">Select Domain to Review</h3>
+                <div class="domain-item" data-domain="organizational" data-action="review">
+                    <div class="domain-title">1. Design for Organizational Complexity</div>
+                    <div class="domain-weight">26% of exam</div>
+                </div>
+                <div class="domain-item" data-domain="new-solutions" data-action="review">
+                    <div class="domain-title">2. Design for New Solutions</div>
+                    <div class="domain-weight">29% of exam</div>
+                </div>
+                <div class="domain-item" data-domain="improvement" data-action="review">
+                    <div class="domain-title">3. Continuous Improvement</div>
+                    <div class="domain-weight">25% of exam</div>
+                </div>
+                <div class="domain-item" data-domain="migration" data-action="review">
+                    <div class="domain-title">4. Migration & Modernization</div>
+                    <div class="domain-weight">20% of exam</div>
+                </div>
+            </div>
+
+            <div id="flashcard-view" class="hidden">
+                <div class="flashcard-container">
+                    <div class="flashcard" id="flashcard">
+                        <div class="card-face card-front">
+                            <div class="card-label">Question</div>
+                            <div class="card-content" id="card-question"></div>
+                            <p style="color: var(--aws-gray); font-size: 0.8rem; margin-top: 20px;">Tap to flip</p>
+                        </div>
+                        <div class="card-face card-back">
+                            <div class="card-label">Answer</div>
+                            <div class="card-content" id="card-answer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-review" id="review-btn">Review Again</button>
+                    <button class="btn btn-know" id="know-btn">I Know This</button>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <span style="color: var(--aws-gray);" id="card-counter">Card 1 of 10</span>
+                </div>
+            </div>
+
+            <div id="empty-state" class="empty-state hidden">
+                <h3>No cards in this domain yet!</h3>
+                <p>Add some flashcards using the "Add Cards" tab.</p>
+            </div>
+        </div>
+
+        <!-- Progress View -->
+        <div id="progress-view" class="view hidden">
+            <div class="admin-section">
+                <h3 style="margin-bottom: 15px;">Overall Progress</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="overall-progress" style="width: 0%"></div>
+                </div>
+                <p style="color: var(--aws-gray); margin-top: 10px; text-align: center;" id="progress-text">0% Complete</p>
+            </div>
+
+            <div class="admin-section">
+                <h3 style="margin-bottom: 15px;">Domain Progress</h3>
+                <div id="domain-progress"></div>
+            </div>
+        </div>
+
+        <!-- Admin View -->
+        <div id="admin-view" class="view hidden">
+            <div class="admin-section">
+                <h3 style="margin-bottom: 15px;">Add Learning Topic</h3>
+                <form id="add-topic-form">
+                    <div class="form-group">
+                        <label>Domain</label>
+                        <select id="topic-domain" required>
+                            <option value="organizational">Design for Organizational Complexity</option>
+                            <option value="new-solutions">Design for New Solutions</option>
+                            <option value="improvement">Continuous Improvement</option>
+                            <option value="migration">Migration & Modernization</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Topic Title</label>
+                        <input type="text" id="topic-title-input" required placeholder="e.g., AWS Organizations" />
+                    </div>
+                    <div class="form-group">
+                        <label>Summary (brief overview)</label>
+                        <textarea id="topic-summary-input" required placeholder="1-2 sentence summary..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Content (detailed explanation)</label>
+                        <textarea id="topic-content-input" required placeholder="Detailed content with key points..." style="min-height: 150px;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>AWS Doc Links (optional, one per line)</label>
+                        <textarea id="topic-links-input" placeholder="https://docs.aws.amazon.com/...&#10;https://aws.amazon.com/whitepapers/..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Topic</button>
+                </form>
+            </div>
+
+            <div class="admin-section">
+                <h3 style="margin-bottom: 15px;">Add Flashcard</h3>
+                <form id="add-card-form">
+                    <div class="form-group">
+                        <label>Domain</label>
+                        <select id="card-domain" required>
+                            <option value="organizational">Design for Organizational Complexity</option>
+                            <option value="new-solutions">Design for New Solutions</option>
+                            <option value="improvement">Continuous Improvement</option>
+                            <option value="migration">Migration & Modernization</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Question / Concept</label>
+                        <textarea id="card-question-input" required placeholder="e.g., What is AWS Organizations?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Answer / Explanation</label>
+                        <textarea id="card-answer-input" required placeholder="Enter the answer or explanation..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Flashcard</button>
+                </form>
+            </div>
+
+            <div class="admin-section">
+                <h3 style="margin-bottom: 15px;">Manage Content</h3>
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="showManageList('topics')" style="margin-right: 10px;">View Topics</button>
+                    <button class="btn btn-primary" onclick="showManageList('cards')">View Flashcards</button>
+                </div>
+                <div id="manage-list"></div>
+            </div>
+
+            <div class="admin-section">
+                <h3 style="margin-bottom: 15px;">Reset Content</h3>
+                <p style="color: var(--aws-gray); margin-bottom: 15px;">Reset all content to official AWS SA Pro study material (will delete custom additions)</p>
+                <button class="btn btn-review" onclick="resetToOfficialContent()" style="width: 100%;">Reset to Official Content</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structures
+        let topics = [];
+        let flashcards = [];
+        let currentDomain = null;
+        let currentCardIndex = 0;
+        let currentTopicId = null;
+        let isFlipped = false;
+
+        // Load data from localStorage
+        function loadData() {
+            // Load topics
+            const savedTopics = localStorage.getItem('aws-topics');
+            if (savedTopics) {
+                topics = JSON.parse(savedTopics);
+            } else if (typeof awsTopics !== 'undefined') {
+                // Load comprehensive AWS content from aws-content.js
+                topics = awsTopics.map((topic, index) => ({
+                    id: Date.now() + index,
+                    domain: topic.domain,
+                    title: topic.title,
+                    summary: topic.summary,
+                    content: topic.content,
+                    links: topic.links || [],
+                    read: false
+                }));
+                saveTopics();
+            } else {
+                topics = [];
+                saveTopics();
+            }
+
+            // Load flashcards
+            const savedCards = localStorage.getItem('aws-flashcards');
+            if (savedCards) {
+                flashcards = JSON.parse(savedCards);
+            } else if (typeof awsFlashcards !== 'undefined') {
+                // Load comprehensive flashcards from aws-content.js
+                flashcards = awsFlashcards.map((card, index) => ({
+                    id: Date.now() + 10000 + index,
+                    domain: card.domain,
+                    question: card.question,
+                    answer: card.answer,
+                    status: 'new'
+                }));
+                saveCards();
+            } else {
+                flashcards = [];
+                saveCards();
+            }
+        }
+
+        function saveTopics() {
+            localStorage.setItem('aws-topics', JSON.stringify(topics));
+            updateStats();
+        }
+
+        function saveCards() {
+            localStorage.setItem('aws-flashcards', JSON.stringify(flashcards));
+            updateStats();
+        }
+
+        // View management
+        function showView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById(`${viewName}-view`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.view === viewName);
+            });
+
+            if (viewName === 'learn') {
+                showTopicList();
+            } else if (viewName === 'review') {
+                showDomainSelector();
+            } else if (viewName === 'progress') {
+                updateProgress();
+            } else if (viewName === 'admin') {
+                showManageList('topics');
+            }
+        }
+
+        // Learn view functions
+        function showTopicList() {
+            document.getElementById('topic-list-view').classList.remove('hidden');
+            document.getElementById('domain-topics-view').classList.add('hidden');
+            document.getElementById('topic-detail-view').classList.add('hidden');
+        }
+
+        function showDomainTopics(domain) {
+            currentDomain = domain;
+            const domainTopics = topics.filter(t => t.domain === domain);
+
+            const domainNames = {
+                'organizational': 'Design for Organizational Complexity',
+                'new-solutions': 'Design for New Solutions',
+                'improvement': 'Continuous Improvement',
+                'migration': 'Migration & Modernization'
+            };
+
+            document.getElementById('domain-topics-title').textContent = domainNames[domain];
+            document.getElementById('topic-list-view').classList.add('hidden');
+            document.getElementById('domain-topics-view').classList.remove('hidden');
+
+            if (domainTopics.length === 0) {
+                document.getElementById('topics-container').innerHTML = '';
+                document.getElementById('no-topics-msg').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('no-topics-msg').classList.add('hidden');
+            const html = domainTopics.map(topic => `
+                <div class="topic-card ${topic.read ? 'read' : ''}" onclick="showTopicDetail(${topic.id})">
+                    <div class="topic-header">
+                        <div class="topic-title">${topic.title}</div>
+                        <div class="topic-badge ${topic.read ? 'read' : ''}">
+                            ${topic.read ? '✓ Read' : 'New'}
+                        </div>
+                    </div>
+                    <div class="topic-summary">${topic.summary}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('topics-container').innerHTML = html;
+        }
+
+        function showTopicDetail(topicId) {
+            const topic = topics.find(t => t.id === topicId);
+            if (!topic) return;
+
+            currentTopicId = topicId;
+            document.getElementById('detail-title').textContent = topic.title;
+            document.getElementById('detail-content').innerHTML = topic.content;
+
+            // Show links if any
+            if (topic.links && topic.links.length > 0) {
+                const linksHtml = '<h4>Official AWS Documentation</h4>' +
+                    topic.links.map(link => `<a href="${link}" target="_blank" class="topic-link">→ ${link}</a>`).join('');
+                document.getElementById('detail-links').innerHTML = linksHtml;
+            } else {
+                document.getElementById('detail-links').innerHTML = '';
+            }
+
+            // Update button text
+            document.getElementById('mark-read-btn').textContent = topic.read ? 'Mark as Unread' : 'Mark as Read';
+
+            document.getElementById('domain-topics-view').classList.add('hidden');
+            document.getElementById('topic-detail-view').classList.remove('hidden');
+        }
+
+        function markTopicRead() {
+            const topic = topics.find(t => t.id === currentTopicId);
+            if (topic) {
+                topic.read = !topic.read;
+                saveTopics();
+                showTopicDetail(currentTopicId);
+            }
+        }
+
+        function backToTopicList() {
+            showTopicList();
+        }
+
+        function backToDomainTopics() {
+            showDomainTopics(currentDomain);
+        }
+
+        // Review (flashcard) view functions
+        function showDomainSelector() {
+            document.getElementById('domain-selector').classList.remove('hidden');
+            document.getElementById('flashcard-view').classList.add('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+        }
+
+        function startStudying(domain) {
+            currentDomain = domain;
+            const domainCards = flashcards.filter(c => c.domain === domain);
+
+            if (domainCards.length === 0) {
+                document.getElementById('domain-selector').classList.add('hidden');
+                document.getElementById('empty-state').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('domain-selector').classList.add('hidden');
+            document.getElementById('flashcard-view').classList.remove('hidden');
+            currentCardIndex = 0;
+            showCard();
+        }
+
+        function showCard() {
+            const domainCards = flashcards.filter(c => c.domain === currentDomain);
+            if (currentCardIndex >= domainCards.length) {
+                currentCardIndex = 0;
+            }
+
+            const card = domainCards[currentCardIndex];
+            document.getElementById('card-question').textContent = card.question;
+            document.getElementById('card-answer').textContent = card.answer;
+            document.getElementById('card-counter').textContent =
+                `Card ${currentCardIndex + 1} of ${domainCards.length}`;
+
+            // Reset flip
+            isFlipped = false;
+            document.getElementById('flashcard').classList.remove('flipped');
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function markCard(status) {
+            const domainCards = flashcards.filter(c => c.domain === currentDomain);
+            const card = domainCards[currentCardIndex];
+            const cardIndex = flashcards.findIndex(c => c.id === card.id);
+            flashcards[cardIndex].status = status;
+            saveData();
+
+            currentCardIndex++;
+            if (currentCardIndex >= domainCards.length) {
+                currentCardIndex = 0;
+            }
+            showCard();
+        }
+
+        function updateStats() {
+            // Learn view stats
+            document.getElementById('total-topics').textContent = topics.length;
+            document.getElementById('read-topics').textContent = topics.filter(t => t.read).length;
+
+            // Both views show total cards
+            document.getElementById('total-cards').textContent = flashcards.length;
+            if (document.getElementById('review-total-cards')) {
+                document.getElementById('review-total-cards').textContent = flashcards.length;
+            }
+
+            document.getElementById('known-cards').textContent =
+                flashcards.filter(c => c.status === 'known').length;
+            document.getElementById('review-cards').textContent =
+                flashcards.filter(c => c.status === 'review').length;
+        }
+
+        function updateProgress() {
+            const total = flashcards.length;
+            const known = flashcards.filter(c => c.status === 'known').length;
+            const percentage = total > 0 ? Math.round((known / total) * 100) : 0;
+
+            document.getElementById('overall-progress').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = percentage + '% Complete';
+
+            // Domain progress
+            const domains = [
+                { id: 'organizational', name: 'Design for Organizational Complexity' },
+                { id: 'new-solutions', name: 'Design for New Solutions' },
+                { id: 'improvement', name: 'Continuous Improvement' },
+                { id: 'migration', name: 'Migration & Modernization' }
+            ];
+
+            const html = domains.map(domain => {
+                const domainCards = flashcards.filter(c => c.domain === domain.id);
+                const domainKnown = domainCards.filter(c => c.status === 'known').length;
+                const domainPercent = domainCards.length > 0 ?
+                    Math.round((domainKnown / domainCards.length) * 100) : 0;
+
+                return `
+                    <div style="margin: 15px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>${domain.name}</span>
+                            <span style="color: var(--aws-orange);">${domainKnown}/${domainCards.length}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${domainPercent}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('domain-progress').innerHTML = html;
+        }
+
+        // Admin view functions
+        function showManageList(type) {
+            const domainNames = {
+                'organizational': 'Organizational Complexity',
+                'new-solutions': 'New Solutions',
+                'improvement': 'Continuous Improvement',
+                'migration': 'Migration & Modernization'
+            };
+
+            if (type === 'topics') {
+                const html = topics.map(topic => `
+                    <div class="card-item">
+                        <div class="card-item-content">
+                            <div class="card-item-title">${topic.title}</div>
+                            <div class="card-item-domain">${domainNames[topic.domain]} • ${topic.read ? 'Read' : 'Unread'}</div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteTopic(${topic.id})">Delete</button>
+                    </div>
+                `).join('');
+
+                document.getElementById('manage-list').innerHTML = html ||
+                    '<p style="color: var(--aws-gray); text-align: center;">No topics yet</p>';
+            } else {
+                const html = flashcards.map(card => `
+                    <div class="card-item">
+                        <div class="card-item-content">
+                            <div class="card-item-title">${card.question.substring(0, 60)}...</div>
+                            <div class="card-item-domain">${domainNames[card.domain]}</div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteCard(${card.id})">Delete</button>
+                    </div>
+                `).join('');
+
+                document.getElementById('manage-list').innerHTML = html ||
+                    '<p style="color: var(--aws-gray); text-align: center;">No cards yet</p>';
+            }
+        }
+
+        function deleteTopic(id) {
+            if (confirm('Delete this topic?')) {
+                topics = topics.filter(t => t.id !== id);
+                saveTopics();
+                showManageList('topics');
+            }
+        }
+
+        function deleteCard(id) {
+            if (confirm('Delete this flashcard?')) {
+                flashcards = flashcards.filter(c => c.id !== id);
+                saveCards();
+                showManageList('cards');
+            }
+        }
+
+        function resetToOfficialContent() {
+            if (confirm('This will reset all content to official AWS SA Pro material. All custom topics and flashcards will be deleted. Continue?')) {
+                localStorage.removeItem('aws-topics');
+                localStorage.removeItem('aws-flashcards');
+                loadData();
+                alert('Content reset to official AWS material!');
+                showView('learn');
+            }
+        }
+
+        // Event listeners
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => showView(btn.dataset.view));
+        });
+
+        document.querySelectorAll('.domain-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const action = item.dataset.action;
+                const domain = item.dataset.domain;
+                if (action === 'learn') {
+                    showDomainTopics(domain);
+                } else if (action === 'review') {
+                    startStudying(domain);
+                }
+            });
+        });
+
+        document.getElementById('flashcard').addEventListener('click', flipCard);
+        document.getElementById('review-btn').addEventListener('click', () => markCard('review'));
+        document.getElementById('know-btn').addEventListener('click', () => markCard('known'));
+        document.getElementById('mark-read-btn').addEventListener('click', markTopicRead);
+
+        // Add topic form
+        document.getElementById('add-topic-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const links = document.getElementById('topic-links-input').value
+                .split('\n')
+                .map(l => l.trim())
+                .filter(l => l.length > 0);
+
+            const newTopic = {
+                id: Date.now(),
+                domain: document.getElementById('topic-domain').value,
+                title: document.getElementById('topic-title-input').value,
+                summary: document.getElementById('topic-summary-input').value,
+                content: document.getElementById('topic-content-input').value.replace(/\n/g, '<br>'),
+                links: links,
+                read: false
+            };
+            topics.push(newTopic);
+            saveTopics();
+            e.target.reset();
+            alert('Topic added!');
+            showManageList('topics');
+        });
+
+        // Add flashcard form
+        document.getElementById('add-card-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newCard = {
+                id: Date.now(),
+                domain: document.getElementById('card-domain').value,
+                question: document.getElementById('card-question-input').value,
+                answer: document.getElementById('card-answer-input').value,
+                status: 'new'
+            };
+            flashcards.push(newCard);
+            saveCards();
+            e.target.reset();
+            alert('Flashcard added!');
+            showManageList('cards');
+        });
+
+        // Initialize
+        loadData();
+        updateStats();
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+    </script>
+</body>
+</html>
