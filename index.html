@@ -932,6 +932,7 @@
             if (!topic) return;
 
             currentTopicId = topicId;
+            currentDomain = topic.domain;
             document.getElementById('detail-title').textContent = topic.title;
             document.getElementById('detail-content').innerHTML = topic.content;
 
@@ -947,6 +948,7 @@
             // Update button text
             document.getElementById('mark-read-btn').textContent = topic.read ? 'Mark as Unread' : 'Mark as Read';
 
+            document.getElementById('topic-list-view').classList.add('hidden');
             document.getElementById('domain-topics-view').classList.add('hidden');
             document.getElementById('topic-detail-view').classList.remove('hidden');
         }
@@ -965,7 +967,16 @@
         }
 
         function backToDomainTopics() {
-            showDomainTopics(currentDomain);
+            const searchValue = document.getElementById('search-topics').value;
+            if (searchValue) {
+                // If there's an active search, go back to search results
+                document.getElementById('topic-detail-view').classList.add('hidden');
+                document.getElementById('topic-list-view').classList.remove('hidden');
+                // Trigger search to show results again
+                document.getElementById('search-topics').dispatchEvent(new Event('input'));
+            } else {
+                showDomainTopics(currentDomain);
+            }
         }
 
         // Review (flashcard) view functions
@@ -997,7 +1008,8 @@
             } else if (domain) {
                 filteredCards = flashcards.filter(c => c.domain === domain);
             } else {
-                filteredCards = flashcards;
+                // All cards
+                filteredCards = [...flashcards];
             }
 
             // Apply search filter if active
@@ -1017,11 +1029,13 @@
 
             if (currentCards.length === 0) {
                 document.getElementById('domain-selector').classList.add('hidden');
+                document.getElementById('flashcard-view').classList.add('hidden');
                 document.getElementById('empty-state').classList.remove('hidden');
                 return;
             }
 
             document.getElementById('domain-selector').classList.add('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
             document.getElementById('flashcard-view').classList.remove('hidden');
             currentCardIndex = 0;
             showCard();
@@ -1263,15 +1277,25 @@
 
         // Search functionality for cards
         document.getElementById('search-cards').addEventListener('input', (e) => {
-            searchQuery = e.target.value;
-            if (searchQuery && currentCards.length > 0) {
-                // Re-apply current filter with search
-                const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-                if (activeFilter !== 'all') {
-                    startStudying(null, activeFilter);
-                } else if (currentDomain) {
-                    startStudying(currentDomain, 'all');
-                }
+            searchQuery = e.target.value.trim();
+
+            if (!searchQuery) {
+                // Clear search - go back to domain selector
+                showDomainSelector();
+                return;
+            }
+
+            // Start studying with search filter
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            if (activeFilter === 'random') {
+                startStudying(null, 'random');
+            } else if (activeFilter === 'bookmarked') {
+                startStudying(null, 'bookmarked');
+            } else if (activeFilter === 'review') {
+                startStudying(null, 'review');
+            } else {
+                // Search across all cards
+                startStudying(null, 'all');
             }
         });
 
