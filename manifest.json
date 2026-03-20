@@ -2,7 +2,7 @@
   "name": "AWS SA Pro Prep",
   "short_name": "AWS SA Pro",
   "description": "AWS Solutions Architect Professional Certification Study App",
-  "start_url": "/",
+  "start_url": "/aws-sa-pro-prep/",
   "display": "standalone",
   "background_color": "#161E2D",
   "theme_color": "#232F3E",

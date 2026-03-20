@@ -1,8 +1,9 @@
-const CACHE_NAME = 'aws-sa-pro-v1';
+const CACHE_NAME = 'aws-sa-pro-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  '/aws-sa-pro-prep/',
+  '/aws-sa-pro-prep/index.html',
+  '/aws-sa-pro-prep/manifest.json',
+  '/aws-sa-pro-prep/aws-content.js'
 ];
 
 self.addEventListener('install', event => {
