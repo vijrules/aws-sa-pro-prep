@@ -4068,6 +4068,725 @@ const awsFlashcards = [
         domain: 'migration',
         question: 'What is the difference between Snowball Edge and Snowcone?',
         answer: 'Snowcone: 8TB, ultra-portable, lightweight, edge computing, 300W power. Snowball Edge: 80TB/210TB, ruggedized, compute options available, more capacity. Choose based on data size and portability needs.'
+    },
+
+    // Additional Organizational Complexity - Deep Dive
+    {
+        domain: 'organizational',
+        question: 'Can SCPs affect the management account in AWS Organizations?',
+        answer: 'No. SCPs do NOT affect the management (master) account. They only affect member accounts. Also, SCPs do not affect service-linked roles.'
+    },
+    {
+        domain: 'organizational',
+        question: 'What is the difference between allow list and deny list SCP strategies?',
+        answer: 'Allow list: Explicitly allow specific services (everything else denied by default, FullAWSAccess must be removed). Deny list: Explicitly deny specific services (everything else allowed, used with FullAWSAccess). Deny always wins over allow.'
+    },
+    {
+        domain: 'organizational',
+        question: 'How many levels deep can you nest OUs in AWS Organizations?',
+        answer: 'Up to 5 levels deep. Root is level 0, so you can have OUs at levels 1, 2, 3, 4, and 5.'
+    },
+    {
+        domain: 'organizational',
+        question: 'What happens to AWS resources when you remove an account from AWS Organizations?',
+        answer: 'Resources remain intact. The account becomes standalone. Loses access to consolidated billing, shared Reserved Instances, and Organization policies (SCPs, tag policies). Must set up separate billing.'
+    },
+    {
+        domain: 'organizational',
+        question: 'What is AWS IAM Access Analyzer and what does it detect?',
+        answer: 'Analyzes resource policies to identify resources shared with external entities. Detects: S3 buckets, IAM roles, KMS keys, Lambda functions, SQS queues, Secrets Manager secrets accessible outside your account/organization. Helps find unintended access.'
+    },
+    {
+        domain: 'organizational',
+        question: 'What is the External ID in cross-account IAM roles used for?',
+        answer: 'Prevents confused deputy problem when third-party assumes role. Acts as a secret between you and third-party. Third-party must provide correct External ID to assume the role, preventing them from accidentally accessing wrong customer account.'
+    },
+    {
+        domain: 'organizational',
+        question: 'What is AWS Service Catalog TagOptions and how does it help?',
+        answer: 'TagOptions are key-value pairs that can be associated with portfolios and products. Automatically applied to resources launched from Service Catalog. Ensures consistent tagging for cost allocation and governance without user input.'
+    },
+    {
+        domain: 'organizational',
+        question: 'How do AWS Config Aggregators work in multi-account setup?',
+        answer: 'Aggregator in one account collects Config data from multiple accounts and regions. Requires authorization from source accounts. Provides organization-wide compliance view. Can aggregate from entire Organizations or specific accounts.'
+    },
+    {
+        domain: 'organizational',
+        question: 'What is the difference between AWS SSO permission sets and IAM roles?',
+        answer: 'Permission sets are templates that create IAM roles in each account. SSO manages the roles centrally - changes to permission set update all accounts. Users get temporary credentials via SSO. Easier to manage than creating roles manually in each account.'
+    },
+    {
+        domain: 'organizational',
+        question: 'Can you use AWS RAM to share resources across Organizations?',
+        answer: 'No. AWS RAM only works within a single AWS Organization. For cross-organization sharing, use other methods like cross-account IAM roles, resource policies, or VPC peering.'
+    },
+
+    // Compute & Containers - Advanced
+    {
+        domain: 'new-solutions',
+        question: 'What is the difference between EC2 ENA and EFA?',
+        answer: 'ENA (Elastic Network Adapter): Enhanced networking, up to 100 Gbps, lower latency. EFA (Elastic Fabric Adapter): For HPC and ML, includes OS-bypass for ultra-low latency, supports MPI, only works with specific instance types in placement groups.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What are EC2 Capacity Reservations and how do they differ from Reserved Instances?',
+        answer: 'Capacity Reservations: Reserve capacity in specific AZ, no commitment, pay On-Demand rate whether used or not. Reserved Instances: Billing discount, 1-3 year commitment, can be regional or zonal. Combine both for discount + guaranteed capacity.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the maximum execution time for Lambda functions?',
+        answer: '15 minutes (900 seconds). For longer-running tasks, use ECS/Fargate, Step Functions for orchestration, or break into smaller Lambda functions.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Lambda SnapStart and when should you use it?',
+        answer: 'Improves cold start time for Java functions by up to 10x. Caches initialized execution environment. Use for: Java applications with slow cold starts, latency-sensitive workloads. Not available for all runtimes.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the difference between ECS awsvpc network mode and bridge mode?',
+        answer: 'awsvpc: Each task gets own ENI with private IP and security group (Fargate only supports this). bridge: Uses Docker bridge, tasks share host network namespace, dynamic port mapping (EC2 only). host: Task uses host network directly (EC2 only).'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'How does ECS Service Auto Scaling differ from EC2 Auto Scaling for ECS?',
+        answer: 'ECS Service Auto Scaling: Scales task count within service. EC2 Auto Scaling: Scales EC2 instances (cluster capacity). Both needed for full auto-scaling: scale tasks for load, scale instances for capacity. Fargate handles capacity automatically.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is EKS Pod Security Policy (PSP) and why is it deprecated?',
+        answer: 'PSP was cluster-level control of pod security. Deprecated in K8s 1.25, removed in 1.25+. Replaced by Pod Security Standards (PSS) with three levels: Privileged, Baseline, Restricted. PSS is easier and more flexible.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Karpenter for EKS and how does it differ from Cluster Autoscaler?',
+        answer: 'Karpenter: Fast, intelligent node provisioning, provisions right-sized nodes in seconds, consolidates nodes. Cluster Autoscaler: Slower, scales node groups, less efficient bin-packing. Karpenter is AWS best practice for EKS auto-scaling.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is AWS Batch Job Queue priority?',
+        answer: 'Jobs with higher priority values run first. Range: 0-10000. Jobs in same queue with same priority run FIFO. Use for: prioritizing critical jobs, implementing SLAs, managing mixed workload priorities.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Step Functions Express Workflows synchronous vs asynchronous?',
+        answer: 'Synchronous: Wait for result (like HTTP request), max 5 min, use for request-response patterns. Asynchronous: Returns immediately, max 5 min, use for fire-and-forget. Both at-least-once execution.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is EventBridge Schema Registry used for?',
+        answer: 'Discovers, stores, and versions event schemas. Auto-generates code bindings for type-safe event handling. Supports OpenAPI schemas. Enables event-driven architecture with schema validation and versioning.'
+    },
+
+    // Database - Advanced
+    {
+        domain: 'new-solutions',
+        question: 'What is Aurora Backtrack and when should you use it?',
+        answer: 'Rewind database to specific point in time without restoring from backup. Much faster than point-in-time restore. Use for: recovering from user errors, testing rollback scenarios. Only available for Aurora MySQL, costs extra.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the difference between Aurora Global Database and RDS Read Replicas?',
+        answer: 'Aurora Global: < 1s replication, RPO ~1s, dedicated secondary region infrastructure, fast region failover. RDS Read Replicas: Minutes of lag, RPO minutes, manual promotion, slower failover. Global Database for DR, replicas for read scaling.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is DynamoDB Global Tables RPO and RTO?',
+        answer: 'RPO: typically < 1 second (sub-second replication). RTO: Sub-second to seconds (automatic failover). Multi-active, eventual consistency across regions. Use for: globally distributed applications, disaster recovery.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the difference between DynamoDB Streams and Kinesis Data Streams for DynamoDB?',
+        answer: 'DynamoDB Streams: 24-hour retention, limited consumers (2 per shard), eventual consistency. Kinesis Data Streams: Up to 1 year retention, unlimited consumers, higher throughput. Use Kinesis for: more consumers, longer retention, fan-out to multiple services.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is RDS Multi-AZ failover time and what triggers it?',
+        answer: 'Failover time: 60-120 seconds. Triggers: Primary failure, AZ failure, instance type change, OS patching, manual failover. DNS CNAME updated to standby. Applications automatically reconnect using same endpoint.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the difference between RDS Read Replica synchronous and Aurora Read Replica?',
+        answer: 'RDS Read Replica: Asynchronous replication, lag in seconds/minutes, separate storage. Aurora Read Replica: Same shared storage layer, < 10ms lag, up to 15 replicas. Aurora replicas much faster and more consistent.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'When should you use ElastiCache Redis Cluster Mode vs Cluster Mode Disabled?',
+        answer: 'Cluster Mode Enabled: Scale horizontally (multiple shards), up to 500 nodes, data partitioned. Cluster Mode Disabled: Single shard, max 5 replicas, vertical scaling only, simpler. Use cluster mode for: large datasets, horizontal scaling needs.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Redis AUTH and how does it differ from IAM authentication?',
+        answer: 'Redis AUTH: Token-based, configured in Redis, simpler, available all versions. IAM Auth: Integration with IAM, Redis 6.0+, RBAC support, better for AWS-integrated apps. Use IAM auth for tighter AWS integration and centralized access management.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is DocumentDB elastic clusters vs standard clusters?',
+        answer: 'Elastic: Auto-scales storage and compute, sharding handled automatically, millions of reads/writes per second. Standard: Manual scaling, shared storage architecture (like Aurora). Use elastic for: unpredictable workloads, need for sharding.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Neptune Streams and how is it used?',
+        answer: 'Change stream of graph data (creates, updates, deletes). Use for: triggering Lambda on graph changes, replicating to other systems, audit logging, building materialized views. Similar to DynamoDB Streams but for graph data.'
+    },
+
+    // Storage & Networking - Advanced
+    {
+        domain: 'new-solutions',
+        question: 'What is S3 Object Lock Retention Mode Governance vs Compliance?',
+        answer: 'Governance: Users with special permission can override/delete. Compliance: No one can override, not even root, immutable until retention expires. Use compliance for: regulatory requirements (SEC, FINRA), WORM.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is S3 Replication Time Control (RTC)?',
+        answer: 'Guarantees 99.99% of objects replicate within 15 minutes. Includes metrics and notifications. Costs more than standard replication. Use for: strict RPO requirements, compliance, production-critical replication SLAs.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the difference between S3 Transfer Acceleration and CloudFront for uploads?',
+        answer: 'Transfer Acceleration: Uses CloudFront edge locations but for direct S3 upload, optimized TCP, pay per GB transferred. CloudFront PUT: Can use for uploads too but less optimized. Use Transfer Acceleration for: large file uploads from distant locations.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is S3 Multi-Region Access Points?',
+        answer: 'Single global endpoint that routes requests to nearest S3 bucket (active-active). Automatic failover. Simplifies multi-region architecture. Use for: global applications, DR, low-latency access from multiple regions.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'When should you use EFS vs FSx for Lustre vs FSx for NetApp ONTAP?',
+        answer: 'EFS: General Linux workloads, simple NFS, web serving. FSx Lustre: HPC, ML training, media processing, 100s GB/s. FSx ONTAP: Enterprise features, multi-protocol (NFS/SMB/iSCSI), compression, deduplication, snapshots.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Storage Gateway Volume Gateway Cached vs Stored volumes?',
+        answer: 'Cached: Primary data in S3, frequently accessed cached locally (low-latency for recent). Stored: Primary data on-premises, async backup to S3 (keeps all data local). Use cached for: reducing on-prem storage, stored for: low-latency all data.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What are VPC Flow Logs rejected packets and how to troubleshoot?',
+        answer: 'Action field shows REJECT. Causes: Security group denied, NACL denied, routing issue. Troubleshoot: Check SG rules (stateful), check NACL rules (stateless, need both inbound/outbound), check route tables. Flow logs show denied traffic patterns.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the maximum MTU for VPC and when would you change it?',
+        answer: 'Default: 1500 bytes. Jumbo frames: 9001 bytes (within VPC). Lower MTU for VPN/internet. Change for: performance optimization within VPC, reduced packet overhead. Cannot use jumbo frames over internet gateway or VPN.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Transit Gateway inter-region peering bandwidth and latency?',
+        answer: 'Bandwidth: Up to 50 Gbps per region pair. Latency: Uses AWS backbone (lower than internet). Encrypted automatically. Use for: multi-region connectivity, DR, global transit architecture. No transitive routing across peerings.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Direct Connect SiteLink and when to use it?',
+        answer: 'Allows Direct Connect locations to communicate directly without traversing AWS regions. Reduces latency between on-prem locations. Use for: connecting multiple data centers via AWS network, bypassing internet, lower latency than VPN.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Route 53 Resolver DNS Firewall?',
+        answer: 'Blocks DNS queries to malicious domains. Rule groups with allow/deny lists. Integrates with AWS Managed Rules. Use for: preventing DNS exfiltration, blocking malware C2, securing outbound DNS queries.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the difference between CloudFront Origin Shield and Regional Edge Cache?',
+        answer: 'Regional Edge Cache: Automatic middle layer between edge and origin. Origin Shield: Additional caching layer, centralized, reduces load on origin, better cache hit ratio. Use Origin Shield for: spiky traffic, multiple regions accessing same origin.'
+    },
+
+    // Integration & Analytics - Advanced
+    {
+        domain: 'new-solutions',
+        question: 'What is API Gateway usage plans and how do they control access?',
+        answer: 'Define throttle limits (rate and burst) and quotas (requests per day/week/month) per API key. Use for: monetization, tiered access levels, preventing abuse. Requires API keys enabled and associated with usage plan.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the difference between API Gateway private integration via VPC Link vs Lambda?',
+        answer: 'VPC Link: Direct to ALB/NLB in VPC (for existing services), uses Network Load Balancer. Lambda: Serverless, scales automatically, can access VPC resources. Use VPC Link for: containerized apps, existing microservices. Lambda for: new serverless apps.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is SQS delay queue vs visibility timeout vs message timer?',
+        answer: 'Delay Queue: All messages delayed (0-15 min) before becoming visible. Visibility Timeout: After retrieval, message hidden from other consumers (0-12 hours). Message Timer: Per-message delay. Use delay queue for: rate limiting, batch processing schedules.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is SQS FIFO exactly-once processing and how is it guaranteed?',
+        answer: 'Message deduplication ID prevents duplicates within 5-minute window. Content-based (SHA-256 of body) or explicit deduplication ID. Sequencing within message group guaranteed. Use for: financial transactions, order processing.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is SNS message filtering and what are the filter policy options?',
+        answer: 'Filters messages at subscription level based on message attributes. Supports: string matching, numeric ranges, existence checks, OR/AND logic. Reduces Lambda invocations and SQS messages. Use for: targeted message delivery, reducing costs.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Kinesis Data Streams enhanced fan-out and when to use it?',
+        answer: 'Dedicated throughput per consumer (2 MB/s per consumer per shard). Lower latency (~70ms). Costs more. Use for: multiple consumers, low-latency requirements, avoiding consumer contention. Standard fan-out: shared 2 MB/s, higher latency (~200ms).'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the difference between Kinesis Data Analytics for SQL and Apache Flink?',
+        answer: 'SQL: Simpler, SQL queries, managed, limited complexity. Apache Flink: Complex stream processing, Java/Scala, more powerful, more flexibility. Use SQL for: simple transformations, filtering, aggregations. Flink for: complex CEP, ML inference, advanced stateful processing.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Redshift Concurrency Scaling and when does it activate?',
+        answer: 'Automatically adds cluster capacity when queries queue due to concurrency. Transient capacity added within seconds. First 60 minutes per day free per cluster. Use for: spiky query workloads, maintaining SLAs during peak times.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Redshift RA3 node type and why use it over DC2?',
+        answer: 'RA3: Managed storage (scales independently), uses S3, better for growth, pause/resume. DC2: Local SSD, fixed storage, cheaper for smaller workloads. Use RA3 for: scaling storage without scaling compute, large data warehouses, flexibility.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is AWS Glue DataBrew and when to use it vs Glue ETL?',
+        answer: 'DataBrew: Visual, no-code data prep, 250+ transformations, for data analysts. Glue ETL: Code-based (Python/Scala), Spark, for engineers. Use DataBrew for: data analysts, exploratory analysis, simple transformations. Glue ETL for: complex ETL, production pipelines.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Lake Formation governed tables and what do they provide?',
+        answer: 'ACID transactions on S3 (insert, update, delete). Automatic compaction. Time travel queries. Concurrent writes. Use for: data lakes requiring ACID, streaming data with updates, replacing traditional databases with data lakes.'
+    },
+
+    // Continuous Improvement - Advanced
+    {
+        domain: 'improvement',
+        question: 'What is the difference between CloudWatch detailed monitoring and basic monitoring for EC2?',
+        answer: 'Basic: 5-minute intervals, free. Detailed: 1-minute intervals, costs extra. Use detailed for: auto-scaling responsiveness, detecting issues faster, production workloads needing quick metrics.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is CloudWatch Contributor Insights and what does it analyze?',
+        answer: 'Identifies top contributors to metrics (top talkers). Analyzes log data or metrics. Use for: finding top IPs, identifying bad actors, understanding traffic patterns, troubleshooting. Creates time-series data of top N contributors.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is CloudWatch Anomaly Detection and how does it work?',
+        answer: 'ML-powered anomaly detection on metrics. Creates bands showing expected values. Alarms trigger when outside bands. Adapts to metric patterns. Use for: dynamic thresholds, seasonality, reducing alarm fatigue from static thresholds.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is X-Ray sampling and why is it important?',
+        answer: 'Controls what percentage of requests are traced. Default: 1 request/second + 5% of additional. Reduces cost and noise. Custom rules for: higher sampling on specific paths, environment-based sampling. Balance between visibility and cost.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is Systems Manager Parameter Store throughput limits?',
+        answer: 'Standard: 1000 TPS (API calls/sec) per account per region. Advanced: 10000 TPS. Higher throughput tier available on request. Use advanced parameters for: high-throughput apps, parameters > 4KB, longer history.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is the difference between Systems Manager Session Manager and EC2 Instance Connect?',
+        answer: 'Session Manager: No SSH keys, IAM-based, works with on-prem servers, session logging, port forwarding. EC2 Instance Connect: Temporary SSH key, EC2 only, port 22 must be open. Use Session Manager for: no bastion hosts, auditing, hybrid environments.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is Compute Optimizer Savings Plans recommendations?',
+        answer: 'Analyzes usage and recommends optimal Savings Plans commitment. Provides: hourly commitment amount, expected savings, payback period. Use for: optimizing costs, deciding between Compute vs EC2 Savings Plans. Updates daily based on usage patterns.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is the difference between target tracking and step scaling for Auto Scaling?',
+        answer: 'Target Tracking: Specify target metric value (e.g., 50% CPU), ASG adjusts to maintain target. Step Scaling: Different scaling amounts based on alarm threshold (e.g., +1 at 60%, +3 at 80%). Use target tracking for: simpler setup, most use cases.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is Auto Scaling warm pools and when to use them?',
+        answer: 'Pre-initialized instances ready to serve traffic faster than cold starts. Instances stopped (pay for EBS only) or running (pay full price). Use for: applications with slow initialization, need for fast scale-out, predictable traffic spikes.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is AWS Backup vault lock and when to use it?',
+        answer: 'Write-Once-Read-Many (WORM) for backups. Prevents deletion even by root or AWS. Set minimum/maximum retention. Use for: regulatory compliance (SEC 17a-4, FINRA), ransomware protection, audit requirements.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is the difference between AWS Backup continuous backup and snapshot backup?',
+        answer: 'Continuous: Point-in-time restore within retention window (35 days), RPO in seconds, supports RDS/Aurora. Snapshot: Scheduled backups, specific point-in-time copies, longer retention. Use continuous for: low RPO requirements, accidental deletions.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What are the five design principles of the Operational Excellence pillar?',
+        answer: '1) Perform operations as code, 2) Make frequent, small, reversible changes, 3) Refine operations procedures frequently, 4) Anticipate failure, 5) Learn from all operational failures.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is the Well-Architected Sustainability pillar about?',
+        answer: 'Minimize environmental impact: use efficient architectures, right-size resources, use managed services, optimize code, reduce data movement. Goals: lower carbon footprint, efficient resource utilization. Newest pillar (added 2021).'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is the shared responsibility model for security in AWS?',
+        answer: 'AWS: Security OF cloud (hardware, software, networking, facilities). Customer: Security IN cloud (data, IAM, OS patches, network config, encryption). Varies by service: IaaS (more customer), PaaS/SaaS (more AWS).'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is AWS Cost Anomaly Detection and how does it work?',
+        answer: 'ML-powered detection of unusual spending patterns. Creates alerts via SNS. Monitors by service, linked account, or cost allocation tags. Use for: catching unexpected costs early, detecting compromised resources, budget overruns.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is the difference between AWS Budgets and Cost Explorer?',
+        answer: 'Budgets: Set spending limits, proactive alerts before overspend, forecasting, actual vs budget tracking. Cost Explorer: Historical analysis, visualizations, filtering, recommendations. Use both: Budgets for control, Cost Explorer for analysis.'
+    },
+
+    // Migration - Advanced
+    {
+        domain: 'migration',
+        question: 'What is AWS Migration Hub Refactor Spaces?',
+        answer: 'Incremental refactoring of applications. Creates routing layer for strangler fig pattern (gradually replace monolith). Routes traffic between monolith and microservices. Use for: gradual migration, zero-downtime refactoring, strangler fig pattern.'
+    },
+    {
+        domain: 'migration',
+        question: 'What is Application Migration Service (MGN) wave planning?',
+        answer: 'Groups servers into waves for coordinated migration. Manages dependencies. Tracks progress per wave. Use for: large migrations, managing complexity, minimizing risk with phased approach.'
+    },
+    {
+        domain: 'migration',
+        question: 'What is DMS replication instance sizing guideline?',
+        answer: 'Size based on: data volume, change rate, network bandwidth, transformation complexity. Start smaller, monitor CPU/memory/network. Use Multi-AZ for production. Monitor replication lag metric. Scale up if lag increases.'
+    },
+    {
+        domain: 'migration',
+        question: 'What is DMS ongoing replication and what is the latency?',
+        answer: 'Continuous Data Capture (CDC) replicates ongoing changes. Latency: seconds to minutes depending on change rate and instance size. Use for: minimal downtime migrations, keeping source and target in sync, phased cutovers.'
+    },
+    {
+        domain: 'migration',
+        question: 'What is DataSync bandwidth throttling and when to use it?',
+        answer: 'Limits bandwidth used by DataSync (in MB/s). Prevents saturating network link. Use for: production networks with other traffic, preventing impact to business operations, scheduled transfers.'
+    },
+    {
+        domain: 'migration',
+        question: 'What is the difference between Snowball import/export vs Storage Gateway?',
+        answer: 'Snowball: One-time large transfers (TBs-PBs), offline, physical device, weeks. Storage Gateway: Ongoing hybrid storage, online, continuous sync, months/years. Use Snowball for: initial migration, Storage Gateway for: hybrid operations.'
+    },
+    {
+        domain: 'migration',
+        question: 'What is the 6-phase AWS Cloud Adoption Framework (CAF)?',
+        answer: 'Envision (business outcomes), Align (gaps in capabilities), Launch (pilot projects), Scale (expand production), Continuous (optimization). Six perspectives: Business, People, Governance, Platform, Security, Operations.'
+    },
+    {
+        domain: 'migration',
+        question: 'What is AWS Application Discovery Service agentless vs agent-based discovery?',
+        answer: 'Agentless: VMware vCenter connector, VM metrics only, network dependencies, easier. Agent-based: Installed on servers, detailed metrics (processes, connections, performance), works on any server. Use both for comprehensive discovery.'
+    },
+    {
+        domain: 'migration',
+        question: 'What is the difference between pilot light and warm standby DR strategies?',
+        answer: 'Pilot Light: Core systems running (e.g., DB replication), scaled-down, scale up when needed, hours RTO. Warm Standby: Scaled-down but running full stack, just scale up, minutes RTO. Warm standby faster but more expensive.'
+    },
+    {
+        domain: 'migration',
+        question: 'What is AWS Mainframe Modernization runtime environments?',
+        answer: 'Blu Age: Automated refactoring to Java. Micro Focus: Replatform, run COBOL on AWS. Both include: runtime environment, deployment tools, integration with AWS services. Choose based on: effort vs modernization level desired.'
+    },
+
+    // Scenario-Based Questions
+    {
+        domain: 'new-solutions',
+        question: 'Your Lambda functions are timing out connecting to RDS. What should you check?',
+        answer: 'Check: 1) Lambda in same VPC as RDS, 2) Security groups allow Lambda to RDS, 3) Lambda has route to RDS (NAT gateway for internet-based), 4) Connection pooling (use RDS Proxy), 5) Lambda timeout setting (increase if needed), 6) Cold start time.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'DynamoDB is being throttled despite provisioned capacity. What could be wrong?',
+        answer: 'Hot partition: uneven distribution of partition keys. Solutions: 1) Better partition key design (high cardinality), 2) Use composite keys, 3) Add random suffix to spread load, 4) Switch to on-demand mode, 5) Check for large items (max 400KB).'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'S3 uploads are slow from on-premises. How to improve?',
+        answer: 'Solutions: 1) Use S3 Transfer Acceleration, 2) Multipart upload for large files (>100MB), 3) Multiple parallel transfers, 4) CloudFront for uploads via edge, 5) AWS DataSync for ongoing transfers, 6) Direct Connect for consistent bandwidth.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'EC2 instances in private subnet cannot reach internet. Troubleshooting steps?',
+        answer: 'Check: 1) NAT Gateway exists in public subnet, 2) Private subnet route table has 0.0.0.0/0 to NAT Gateway, 3) NAT Gateway in public subnet with IGW route, 4) Security groups allow outbound, 5) NACLs allow traffic both ways, 6) NAT Gateway has Elastic IP.'
+    },
+    {
+        domain: 'improvement',
+        question: 'CloudWatch Logs are expensive. How to reduce costs?',
+        answer: 'Solutions: 1) Set log retention periods (don\'t keep forever), 2) Export old logs to S3 with Glacier, 3) Use log filtering to reduce volume, 4) Sample logs instead of logging everything, 5) Use S3 for long-term storage, 6) Review what you\'re logging (remove debug logs in prod).'
+    },
+    {
+        domain: 'improvement',
+        question: 'Need to run scripts on 1000s of EC2 instances. What service to use?',
+        answer: 'Systems Manager Run Command: Execute scripts at scale, targets by tags/resource groups, no SSH needed, log output, works with on-prem too. Alternative: Automation documents for multi-step workflows, Parameter Store for scripts/commands.'
+    },
+    {
+        domain: 'organizational',
+        question: 'Need to prevent deletion of S3 buckets across all accounts. How?',
+        answer: 'Create SCP with explicit deny on s3:DeleteBucket action. Attach to root or specific OUs. SCP denies always override allow. Test on non-production OU first. Remember: SCPs don\'t affect management account.'
+    },
+    {
+        domain: 'migration',
+        question: 'Migrating 500TB database to AWS. What is the fastest method?',
+        answer: 'AWS Snowball Edge or Snowmobile for data volume. Use multiple Snowball devices in parallel. Once in AWS, use DMS for any delta changes during migration. For ongoing sync, consider Storage Gateway or DataSync for incremental updates.'
+    },
+
+    // More Advanced Service Comparisons
+    {
+        domain: 'new-solutions',
+        question: 'When to use Application Load Balancer vs Network Load Balancer vs Gateway Load Balancer?',
+        answer: 'ALB: HTTP/HTTPS, Layer 7, content routing, WebSocket. NLB: TCP/UDP, Layer 4, extreme performance (millions RPS), static IP. GLB: Deploy 3rd-party appliances (firewalls, IDS), transparent network gateway. Use ALB for most web apps, NLB for gaming/IoT, GLB for security appliances.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the difference between AWS Secrets Manager and Parameter Store for secrets?',
+        answer: 'Secrets Manager: Automatic rotation, RDS integration, cross-account access, costs more, dedicated for secrets. Parameter Store: Free (standard), key-value store, no auto-rotation (unless custom Lambda), cheaper. Use Secrets Manager for: passwords needing rotation, RDS credentials.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'When to use AWS AppSync vs API Gateway?',
+        answer: 'AppSync: GraphQL, real-time subscriptions, offline sync, DynamoDB/Lambda/RDS data sources, built-in caching. API Gateway: REST/HTTP/WebSocket, more flexibility, broader integrations. Use AppSync for: mobile apps, real-time, GraphQL. API Gateway for: REST APIs, diverse backends.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Amazon MQ vs Amazon MSK (Kafka)?',
+        answer: 'Amazon MQ: Managed ActiveMQ/RabbitMQ, traditional message broker, smaller scale, JMS API. MSK: Managed Kafka, event streaming, big data, higher throughput, retention. Use MQ for: migrating existing apps, JMS. MSK for: event streaming, big data pipelines, high throughput.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'When to use AWS Glue vs Amazon EMR for data processing?',
+        answer: 'Glue: Serverless, ETL focus, auto-scaling, pay per DPU-hour, simpler. EMR: More control, custom Spark/Hadoop config, persistent clusters, streaming, interactive. Use Glue for: simple ETL, less ops. EMR for: complex processing, custom configs, ML training.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Amazon Athena vs Amazon Redshift for analytics?',
+        answer: 'Athena: Serverless, query S3 directly, pay per query, no infrastructure, ad-hoc analysis. Redshift: Data warehouse, persistent storage, complex queries, better for frequent queries, dashboards. Use Athena for: ad-hoc, Redshift for: regular reporting, BI tools.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'When to use AWS Lambda vs AWS Fargate?',
+        answer: 'Lambda: Event-driven, 15-min max, pay per invocation, 10GB memory limit, faster cold start for small apps. Fargate: Long-running, containers, unlimited runtime, up to 120GB memory. Use Lambda for: APIs, event processing. Fargate for: continuous processes, larger apps.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is CloudWatch Events vs EventBridge?',
+        answer: 'EventBridge is CloudWatch Events evolution with: SaaS integrations, schema registry, cross-account events, archive/replay. Same API, compatible. EventBridge is superset. Use EventBridge for new applications (all CloudWatch Events features + more).'
+    },
+
+    // Performance and Scaling
+    {
+        domain: 'new-solutions',
+        question: 'What is DynamoDB adaptive capacity and when does it activate?',
+        answer: 'Automatically isolates hot partitions and allocates more throughput. Activates when: partition consistently exceeds capacity, uneven access patterns. Takes 5-30 minutes. Better solution: fix partition key design. Use as band-aid while redesigning schema.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is RDS Performance Insights and what does it show?',
+        answer: 'Visual dashboard showing database performance. Shows: top SQL, wait events, database load, dimensions (user, host, SQL). 7 days free retention. Use for: identifying slow queries, understanding contention, finding bottlenecks. Works with RDS and Aurora.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What causes Lambda cold starts and how to minimize them?',
+        answer: 'Causes: New execution environment, scaling up, deployment, idle. Minimize: 1) Provisioned Concurrency, 2) Keep functions warm (EventBridge schedule), 3) Reduce package size, 4) Use Graviton2 (faster), 5) Optimize init code, 6) Use Lambda SnapStart (Java).'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is EBS gp3 vs gp2 and why is gp3 better?',
+        answer: 'gp3: Baseline 3000 IOPS, 125 MB/s, scale IOPS independently of size, 20% cheaper. gp2: IOPS scale with size (3 IOPS/GB), burstable. Use gp3 for: better price-performance, predictable performance, most workloads. gp2 legacy.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is EBS io2 Block Express and when to use it?',
+        answer: 'Highest performance EBS: 256,000 IOPS, 4,000 MB/s, sub-millisecond latency, 64 TB. Only on R5b, X2idn/X2iedn instance families. 99.999% durability. Use for: largest databases, mission-critical SAP HANA, performance-intensive workloads.'
+    },
+
+    // Security and Compliance
+    {
+        domain: 'improvement',
+        question: 'What is AWS GuardDuty finding types and what do they detect?',
+        answer: 'Types: Reconnaissance (port scanning), Instance (compromised EC2), Account (credential compromise), S3 (unusual API calls), Kubernetes (EKS threats). Severity: Low/Medium/High. Integrates with Security Hub, EventBridge for automated response.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is AWS Security Hub and what does it aggregate?',
+        answer: 'Aggregates findings from: GuardDuty, Inspector, Macie, IAM Access Analyzer, Firewall Manager, Systems Manager, 3rd party tools. Runs compliance checks: CIS, PCI-DSS, AWS Foundational Security. Central security view across accounts.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is Amazon Macie and what does it discover?',
+        answer: 'Discovers and protects sensitive data in S3. Uses ML to find: PII, PHI, credentials, financial data. Creates findings for unusual access patterns. Integrates with Security Hub. Use for: data classification, compliance (GDPR, HIPAA), preventing data leaks.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is AWS WAF and what attacks does it prevent?',
+        answer: 'Web application firewall. Prevents: SQL injection, XSS, rate limiting, geo-blocking, bot protection, size constraints. Managed rules available. Works with: CloudFront, ALB, API Gateway, AppSync. Use for: OWASP Top 10 protection, DDoS mitigation layer 7.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is the difference between AWS Shield Standard and Shield Advanced?',
+        answer: 'Standard: Free, automatic DDoS protection (Layer 3/4), CloudFront and Route 53. Advanced: $3000/month, enhanced detection, DDoS cost protection, DRT support, 24/7 response team, Layer 7 protection. Use Advanced for: business-critical apps, need for DDoS insurance.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is AWS Certificate Manager (ACM) and what are its limitations?',
+        answer: 'Free SSL/TLS certificates for AWS services. Auto-renewal. Limitations: only works with AWS services (ALB, CloudFront, API Gateway), cannot export private key (except in specific regions), regional (CloudFront needs us-east-1). Use for: free certs on AWS services.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is KMS Customer Managed Keys vs AWS Managed Keys?',
+        answer: 'Customer Managed: You control, key policies, rotation optional, cross-account access, $1/month. AWS Managed: AWS controls, auto-rotation every year, no key policy control, free. Use customer managed for: cross-account, custom policies, compliance requirements.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is AWS CloudHSM and when to use it vs KMS?',
+        answer: 'CloudHSM: Dedicated hardware, you manage keys, FIPS 140-2 Level 3, support symmetric/asymmetric, expensive. KMS: Shared multi-tenant, AWS manages, Level 2, easier. Use CloudHSM for: regulatory requirements (Level 3), managing own keys, custom crypto.'
+    },
+
+    // High Availability and Disaster Recovery
+    {
+        domain: 'improvement',
+        question: 'What is Aurora zero-downtime patching and how does it work?',
+        answer: 'Patches replica first, promotes to master, then patches old master. Near-zero downtime. User sees brief failover (< 30s). Application auto-reconnects. Use Multi-AZ for best HA during patching.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is RDS automated backup window and maintenance window?',
+        answer: 'Backup window: Daily automated backups, I/O may be suspended (single-AZ), no impact Multi-AZ. Maintenance window: Weekly, OS patches, DB engine upgrades, can cause downtime (single-AZ) or failover (Multi-AZ). Schedule both during low-traffic periods.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is Amazon Route 53 Application Recovery Controller?',
+        answer: 'Manage failover across regions/AZs. Readiness checks (continuously verify recovery setup), routing controls (shift traffic), safety rules (prevent accidents). Use for: multi-region DR, controlled failovers, ensuring DR setup is ready.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is AWS Elastic Disaster Recovery (DRS) and what does it replace?',
+        answer: 'Replaces CloudEndure Disaster Recovery. Continuous replication of on-prem/cloud servers to AWS. Low-cost staging, fast recovery (minutes). Use for: DR for physical/virtual/cloud servers, minimize DR infrastructure costs, fast RTO.'
+    },
+
+    // Cost Optimization Advanced
+    {
+        domain: 'improvement',
+        question: 'What is the difference between Compute Savings Plans and EC2 Savings Plans?',
+        answer: 'Compute: Flexible (EC2, Fargate, Lambda), any instance family, any region, any OS. EC2: Less flexible (EC2 only), specific instance family in region, can change size/OS/tenancy. Compute higher flexibility, EC2 higher discount. Choose based on: workload flexibility needs.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is Reserved Instance Marketplace and when to use it?',
+        answer: 'Sell unused Standard RIs (not Convertible). 12% service fee. Must be active 30+ days. Buyer gets remaining term. Use for: offloading commitments you no longer need, changing architecture, downsizing. Buy for: discounts on shorter-term commitments.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What are EC2 Spot Instance interruption notices and how to handle them?',
+        answer: '2-minute warning via EC2 metadata and EventBridge. Reasons: capacity needs, price (if max price < Spot price). Handle: checkpoint work, drain connections, save state, graceful shutdown. Use Spot Fleet for automatic replacement from other pools.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is S3 Intelligent-Tiering Archive tiers?',
+        answer: 'Optional: Archive Access (90+ days no access, Glacier-like retrieval), Deep Archive Access (180+ days, 12-hour retrieval). Must opt-in. Auto-moves objects to cheapest tier. Use for: unknown access patterns extending to archive, automatic cost optimization.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What causes unexpected AWS data transfer charges?',
+        answer: 'Common causes: NAT Gateway data processing, cross-AZ traffic, data out to internet, S3 to EC2 in different regions, not using VPC endpoints, CloudFront misconfigured. Solutions: VPC endpoints, same-AZ placement, CloudFront for distribution, monitor with Cost Explorer.'
+    },
+
+    // Networking Deep Dive
+    {
+        domain: 'new-solutions',
+        question: 'What is VPC endpoints vs PrivateLink vs VPC Peering?',
+        answer: 'VPC Endpoint: Access AWS services privately (Gateway for S3/DynamoDB, Interface for others). PrivateLink: Access services in other VPCs (service provider/consumer model). VPC Peering: Connect two VPCs (full network access). Use endpoints for AWS services, PrivateLink for service sharing, peering for full VPC connectivity.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is AWS Network Firewall and when to use it?',
+        answer: 'Managed network firewall for VPC. Stateful/stateless rules, intrusion prevention, deep packet inspection. Use for: centralized outbound filtering, IPS/IDS, advanced threat protection. Works with: Firewall Manager for multi-account. Complements security groups/NACLs.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is VPC Reachability Analyzer and what does it check?',
+        answer: 'Analyzes and debugs network paths between two endpoints in VPC. Checks: route tables, NACLs, security groups, IGW, VGW. Shows where packets are blocked/allowed. No packets sent (configuration analysis). Use for: troubleshooting connectivity, validating security design.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is AWS Client VPN vs Site-to-Site VPN?',
+        answer: 'Client VPN: Individual users connect to VPC (OpenVPN), endpoint in VPC, for remote workers. Site-to-Site VPN: Connect networks (offices to AWS), static/BGP routing, for offices/data centers. Use Client for: remote employees, Site-to-Site for: branch offices.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is Direct Connect hosted connection vs dedicated connection?',
+        answer: 'Dedicated: Physical ethernet port, 1/10/100 Gbps, provisioned by AWS. Hosted: Through APN partner, 50 Mbps to 10 Gbps, faster provisioning, flexible bandwidth. Use hosted for: lower bandwidth needs, faster setup, not long-term commitment.'
+    },
+
+    // Troubleshooting Scenarios
+    {
+        domain: 'new-solutions',
+        question: 'Aurora read replica lag is increasing. What are the causes and solutions?',
+        answer: 'Causes: 1) Heavy write load on primary, 2) Large transactions, 3) Replica instance too small. Solutions: 1) Scale up replica instance, 2) Add more replicas, 3) Review large transactions, 4) Use Aurora Serverless for auto-scaling. Monitor: Replica lag metric in CloudWatch.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'API Gateway returns 502 Bad Gateway. What are common causes?',
+        answer: 'Causes: 1) Lambda function error/timeout, 2) Backend service unavailable, 3) VPC endpoint issues, 4) Integration timeout (29s max), 5) Malformed response from backend. Check: CloudWatch Logs for API Gateway, Lambda logs, backend service health, integration timeout settings.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'CloudFront serving stale content despite cache cleared. Why?',
+        answer: 'Causes: 1) Browser cache not cleared, 2) Invalidation not propagated (takes 10-15 min), 3) Origin sending cache headers, 4) Multiple cache behaviors, 5) Regional edge cache not cleared. Solutions: Check cache headers, use versioned URLs, verify invalidation status.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'ECS tasks failing to pull from ECR. Troubleshooting steps?',
+        answer: 'Check: 1) Task role has ECR permissions (GetAuthorizationToken, BatchGetImage, GetDownloadUrlForLayer), 2) VPC has route to ECR (VPC endpoint or NAT), 3) Security groups allow HTTPS, 4) Image exists and tag correct, 5) ECR repository policy allows access.'
+    },
+    {
+        domain: 'improvement',
+        question: 'CloudWatch alarms stuck in INSUFFICIENT_DATA state. What are the causes?',
+        answer: 'Causes: 1) Metric not publishing data, 2) Metric name/namespace/dimensions wrong, 3) Statistic/period mismatch, 4) New alarm (waiting for data points). Solutions: Verify metric exists with "Get Metrics", check period matches data frequency, wait for evaluation periods to pass.'
+    },
+    {
+        domain: 'improvement',
+        question: 'Lambda function timing out at 30 seconds with ALB. Why?',
+        answer: 'ALB timeout is 30 seconds (not configurable). Lambda default timeout is 3 seconds. Solutions: 1) Increase Lambda timeout (up to 15 min), 2) Process async (accept request, return immediately, process with SQS), 3) Use Step Functions for long workflows, 4) Optimize Lambda cold start.'
+    },
+
+    // Architecture Patterns
+    {
+        domain: 'new-solutions',
+        question: 'What is the strangler fig pattern for migration?',
+        answer: 'Incrementally replace monolith with microservices. Route layer directs traffic: new features to microservices, existing to monolith. Gradually migrate functionality. Use Refactor Spaces or API Gateway. Enables: zero-downtime migration, gradual refactoring, rollback capability.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is CQRS pattern and when to use it in AWS?',
+        answer: 'Command Query Responsibility Segregation. Separate read and write models. Write: API Gateway → Lambda → DynamoDB. Read: DynamoDB Streams → Lambda → ElastiCache/OpenSearch. Use for: different scaling needs for reads/writes, complex queries, event sourcing.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is the scatter-gather pattern with Lambda?',
+        answer: 'Fan-out requests to multiple services, aggregate responses. Implementation: Step Functions parallel state, or SNS → multiple Lambda → aggregate in another Lambda/Step Function. Use for: parallel data retrieval, distributed processing, aggregating from multiple sources.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is chaos engineering and how to implement in AWS?',
+        answer: 'Intentionally inject failures to test resilience. AWS Fault Injection Simulator: chaos experiments for EC2, ECS, EKS, RDS. Scenarios: stop instances, throttle API, increase latency. Use for: validating failure handling, game days, improving resilience.'
+    },
+
+    // Service Limits and Quotas
+    {
+        domain: 'new-solutions',
+        question: 'What are default Lambda concurrent execution limits?',
+        answer: '1000 concurrent executions per region (soft limit, can increase). Reserved concurrency: guarantee capacity for function. Provisioned concurrency: pre-warmed environments. Exceeding limit causes throttling (429 error). Monitor: ConcurrentExecutions metric.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What is S3 request rate performance and how to scale it?',
+        answer: '3,500 PUT/COPY/POST/DELETE, 5,500 GET/HEAD per second per prefix. Scale: add prefixes (partitioning). No limit on prefixes. CloudFront for GET-heavy. Use for: high throughput applications, understanding S3 performance patterns.'
+    },
+    {
+        domain: 'new-solutions',
+        question: 'What are DynamoDB table limits per account per region?',
+        answer: '2,500 tables per region per account (soft limit). Can request increase. No limit on: item size (max 400KB), items per table, GSIs per table (20 max). Use GSIs and single table design to stay under limit for many entities.'
+    },
+    {
+        domain: 'improvement',
+        question: 'What is Service Quotas and how does it help?',
+        answer: 'View and manage AWS service quotas. Request quota increases from console/API. Monitors usage against quotas. Creates CloudWatch alarms when approaching limits. Use for: proactive quota management, preventing limit-related failures, understanding service constraints.'
     }
 ];
 
