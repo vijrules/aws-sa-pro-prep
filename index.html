@@ -269,6 +269,14 @@
             transform: scale(0.95);
         }
 
+        .highlight {
+            background-color: var(--aws-orange);
+            color: var(--aws-dark);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
         .domain-selector {
             background: var(--aws-dark);
             padding: 20px;
@@ -933,8 +941,21 @@
 
             currentTopicId = topicId;
             currentDomain = topic.domain;
-            document.getElementById('detail-title').textContent = topic.title;
-            document.getElementById('detail-content').innerHTML = topic.content;
+
+            const titleEl = document.getElementById('detail-title');
+            const contentEl = document.getElementById('detail-content');
+
+            // Check if we came from a search
+            const searchValue = document.getElementById('search-topics').value.trim();
+
+            if (searchValue) {
+                // Highlight search terms in title and content
+                titleEl.innerHTML = highlightText(topic.title, searchValue);
+                contentEl.innerHTML = highlightText(topic.content, searchValue);
+            } else {
+                titleEl.textContent = topic.title;
+                contentEl.innerHTML = topic.content;
+            }
 
             // Show links if any
             if (topic.links && topic.links.length > 0) {
@@ -1050,14 +1071,34 @@
             return shuffled;
         }
 
+        function highlightText(text, query) {
+            if (!query || !text) return text;
+
+            // Escape special regex characters in query
+            const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escapedQuery})`, 'gi');
+
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
         function showCard() {
             if (currentCardIndex >= currentCards.length) {
                 currentCardIndex = 0;
             }
 
             const card = currentCards[currentCardIndex];
-            document.getElementById('card-question').textContent = card.question;
-            document.getElementById('card-answer').textContent = card.answer;
+            const questionEl = document.getElementById('card-question');
+            const answerEl = document.getElementById('card-answer');
+
+            // Apply highlighting if there's an active search
+            if (searchQuery) {
+                questionEl.innerHTML = highlightText(card.question, searchQuery);
+                answerEl.innerHTML = highlightText(card.answer, searchQuery);
+            } else {
+                questionEl.textContent = card.question;
+                answerEl.textContent = card.answer;
+            }
+
             document.getElementById('card-counter').textContent =
                 `Card ${currentCardIndex + 1} of ${currentCards.length}`;
 
