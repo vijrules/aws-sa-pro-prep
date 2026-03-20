@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>AWS SA Pro Prep</title>
-    <link rel="manifest" href="manifest.json?v=2">
+    <link rel="manifest" href="manifest.json?v=3">
     <script src="aws-content.js"></script>
 
     <style>
@@ -204,6 +204,69 @@
         .btn-next {
             background: var(--aws-gray);
             color: white;
+        }
+
+        .btn-bookmark {
+            background: var(--aws-orange);
+            color: var(--aws-dark);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .btn-bookmark.bookmarked {
+            background: var(--aws-dark);
+            color: var(--aws-orange);
+            border: 2px solid var(--aws-orange);
+        }
+
+        .search-box {
+            background: var(--aws-dark);
+            border: 2px solid var(--aws-gray);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--aws-light);
+            font-size: 1rem;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--aws-orange);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--aws-dark);
+            border: 2px solid var(--aws-gray);
+            color: var(--aws-light);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: var(--aws-orange);
+            border-color: var(--aws-orange);
+            color: var(--aws-dark);
+        }
+
+        .filter-btn:active {
+            transform: scale(0.95);
         }
 
         .domain-selector {
@@ -510,6 +573,7 @@
             </div>
 
             <div id="topic-list-view">
+                <input type="text" id="search-topics" class="search-box" placeholder="🔍 Search topics...">
                 <div class="domain-selector">
                     <h3 style="margin-bottom: 15px;">Select Domain to Learn</h3>
                     <div class="domain-item" data-domain="organizational" data-action="learn">
@@ -564,9 +628,18 @@
                     <div class="stat-label">Known</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="review-cards">0</div>
-                    <div class="stat-label">Review</div>
+                    <div class="stat-value" id="bookmarked-cards">0</div>
+                    <div class="stat-label">Bookmarked</div>
                 </div>
+            </div>
+
+            <input type="text" id="search-cards" class="search-box" placeholder="🔍 Search flashcards...">
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All Cards</button>
+                <button class="filter-btn" data-filter="bookmarked">Bookmarked</button>
+                <button class="filter-btn" data-filter="review">Need Review</button>
+                <button class="filter-btn" data-filter="random">🎲 Random Mix</button>
             </div>
 
             <div id="domain-selector" class="domain-selector">
@@ -608,6 +681,7 @@
                     <button class="btn btn-next" id="next-btn">Next →</button>
                     <button class="btn btn-know" id="know-btn">I Know This</button>
                 </div>
+                <button class="btn-bookmark" id="bookmark-btn">★ Bookmark This Card</button>
                 <div style="text-align: center; margin-top: 20px;">
                     <span style="color: var(--aws-gray);" id="card-counter">Card 1 of 10</span>
                 </div>
@@ -718,6 +792,9 @@
         let currentCardIndex = 0;
         let currentTopicId = null;
         let isFlipped = false;
+        let currentFilter = 'all';
+        let currentCards = [];
+        let searchQuery = '';
 
         // Load data from localStorage
         function loadData() {
@@ -746,6 +823,11 @@
             const savedCards = localStorage.getItem('aws-flashcards');
             if (savedCards) {
                 flashcards = JSON.parse(savedCards);
+                // Add bookmark property to existing cards if missing
+                flashcards = flashcards.map(card => ({
+                    ...card,
+                    bookmarked: card.bookmarked || false
+                }));
             } else if (typeof awsFlashcards !== 'undefined') {
                 // Load comprehensive flashcards from aws-content.js
                 flashcards = awsFlashcards.map((card, index) => ({
@@ -753,7 +835,8 @@
                     domain: card.domain,
                     question: card.question,
                     answer: card.answer,
-                    status: 'new'
+                    status: 'new',
+                    bookmarked: false
                 }));
                 saveCards();
             } else {
@@ -797,6 +880,14 @@
             document.getElementById('topic-list-view').classList.remove('hidden');
             document.getElementById('domain-topics-view').classList.add('hidden');
             document.getElementById('topic-detail-view').classList.add('hidden');
+
+            // Clear search
+            document.getElementById('search-topics').value = '';
+            const searchResults = document.querySelector('.search-results');
+            if (searchResults) {
+                searchResults.remove();
+            }
+            document.querySelectorAll('#topic-list-view .domain-item').forEach(item => item.style.display = '');
         }
 
         function showDomainTopics(domain) {
@@ -882,13 +973,49 @@
             document.getElementById('domain-selector').classList.remove('hidden');
             document.getElementById('flashcard-view').classList.add('hidden');
             document.getElementById('empty-state').classList.add('hidden');
+
+            // Clear search and reset filter
+            document.getElementById('search-cards').value = '';
+            searchQuery = '';
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
         }
 
-        function startStudying(domain) {
+        function startStudying(domain, filter = 'all') {
             currentDomain = domain;
-            const domainCards = flashcards.filter(c => c.domain === domain);
+            currentFilter = filter;
 
-            if (domainCards.length === 0) {
+            // Get cards based on filter
+            let filteredCards = [];
+            if (filter === 'random') {
+                // All cards from all domains, shuffled
+                filteredCards = [...flashcards];
+            } else if (filter === 'bookmarked') {
+                filteredCards = flashcards.filter(c => c.bookmarked);
+            } else if (filter === 'review') {
+                filteredCards = flashcards.filter(c => c.status === 'review');
+            } else if (domain) {
+                filteredCards = flashcards.filter(c => c.domain === domain);
+            } else {
+                filteredCards = flashcards;
+            }
+
+            // Apply search filter if active
+            if (searchQuery) {
+                filteredCards = filteredCards.filter(c =>
+                    c.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    c.answer.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            }
+
+            // Shuffle if random mode
+            if (filter === 'random') {
+                filteredCards = shuffleArray(filteredCards);
+            }
+
+            currentCards = filteredCards;
+
+            if (currentCards.length === 0) {
                 document.getElementById('domain-selector').classList.add('hidden');
                 document.getElementById('empty-state').classList.remove('hidden');
                 return;
@@ -900,17 +1027,35 @@
             showCard();
         }
 
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
         function showCard() {
-            const domainCards = flashcards.filter(c => c.domain === currentDomain);
-            if (currentCardIndex >= domainCards.length) {
+            if (currentCardIndex >= currentCards.length) {
                 currentCardIndex = 0;
             }
 
-            const card = domainCards[currentCardIndex];
+            const card = currentCards[currentCardIndex];
             document.getElementById('card-question').textContent = card.question;
             document.getElementById('card-answer').textContent = card.answer;
             document.getElementById('card-counter').textContent =
-                `Card ${currentCardIndex + 1} of ${domainCards.length}`;
+                `Card ${currentCardIndex + 1} of ${currentCards.length}`;
+
+            // Update bookmark button
+            const bookmarkBtn = document.getElementById('bookmark-btn');
+            if (card.bookmarked) {
+                bookmarkBtn.textContent = '★ Bookmarked';
+                bookmarkBtn.classList.add('bookmarked');
+            } else {
+                bookmarkBtn.textContent = '☆ Bookmark This Card';
+                bookmarkBtn.classList.remove('bookmarked');
+            }
 
             // Reset flip
             isFlipped = false;
@@ -923,26 +1068,32 @@
         }
 
         function markCard(status) {
-            const domainCards = flashcards.filter(c => c.domain === currentDomain);
-            const card = domainCards[currentCardIndex];
+            const card = currentCards[currentCardIndex];
             const cardIndex = flashcards.findIndex(c => c.id === card.id);
             flashcards[cardIndex].status = status;
-            saveData();
+            saveCards();
 
             currentCardIndex++;
-            if (currentCardIndex >= domainCards.length) {
+            if (currentCardIndex >= currentCards.length) {
                 currentCardIndex = 0;
             }
             showCard();
         }
 
         function nextCard() {
-            // Move to next card without marking status
-            const domainCards = flashcards.filter(c => c.domain === currentDomain);
             currentCardIndex++;
-            if (currentCardIndex >= domainCards.length) {
+            if (currentCardIndex >= currentCards.length) {
                 currentCardIndex = 0;
             }
+            showCard();
+        }
+
+        function toggleBookmark() {
+            const card = currentCards[currentCardIndex];
+            const cardIndex = flashcards.findIndex(c => c.id === card.id);
+            flashcards[cardIndex].bookmarked = !flashcards[cardIndex].bookmarked;
+            currentCards[currentCardIndex].bookmarked = flashcards[cardIndex].bookmarked;
+            saveCards();
             showCard();
         }
 
@@ -959,8 +1110,10 @@
 
             document.getElementById('known-cards').textContent =
                 flashcards.filter(c => c.status === 'known').length;
-            document.getElementById('review-cards').textContent =
-                flashcards.filter(c => c.status === 'review').length;
+            if (document.getElementById('bookmarked-cards')) {
+                document.getElementById('bookmarked-cards').textContent =
+                    flashcards.filter(c => c.bookmarked).length;
+            }
         }
 
         function updateProgress() {
@@ -1087,6 +1240,96 @@
         document.getElementById('next-btn').addEventListener('click', nextCard);
         document.getElementById('know-btn').addEventListener('click', () => markCard('known'));
         document.getElementById('mark-read-btn').addEventListener('click', markTopicRead);
+        document.getElementById('bookmark-btn').addEventListener('click', toggleBookmark);
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filter = btn.dataset.filter;
+                if (filter === 'random') {
+                    startStudying(null, 'random');
+                } else if (filter === 'bookmarked') {
+                    startStudying(null, 'bookmarked');
+                } else if (filter === 'review') {
+                    startStudying(null, 'review');
+                } else {
+                    showDomainSelector();
+                }
+            });
+        });
+
+        // Search functionality for cards
+        document.getElementById('search-cards').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            if (searchQuery && currentCards.length > 0) {
+                // Re-apply current filter with search
+                const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                if (activeFilter !== 'all') {
+                    startStudying(null, activeFilter);
+                } else if (currentDomain) {
+                    startStudying(currentDomain, 'all');
+                }
+            }
+        });
+
+        // Search functionality for topics
+        document.getElementById('search-topics').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const allDomainItems = document.querySelectorAll('#topic-list-view .domain-item');
+
+            if (!query) {
+                allDomainItems.forEach(item => item.style.display = '');
+                return;
+            }
+
+            // Hide domain selector during search
+            allDomainItems.forEach(item => item.style.display = 'none');
+
+            // Show matching topics across all domains
+            const matchingTopics = topics.filter(t =>
+                t.title.toLowerCase().includes(query) ||
+                t.summary.toLowerCase().includes(query) ||
+                t.content.toLowerCase().includes(query)
+            );
+
+            const container = document.getElementById('topic-list-view');
+            let searchResults = container.querySelector('.search-results');
+
+            if (!searchResults) {
+                searchResults = document.createElement('div');
+                searchResults.className = 'search-results';
+                container.insertBefore(searchResults, container.querySelector('.domain-selector'));
+            }
+
+            if (matchingTopics.length === 0) {
+                searchResults.innerHTML = '<p style="color: var(--aws-gray); text-align: center; padding: 20px;">No topics found</p>';
+            } else {
+                const domainNames = {
+                    'organizational': 'Organizational Complexity',
+                    'new-solutions': 'New Solutions',
+                    'improvement': 'Continuous Improvement',
+                    'migration': 'Migration & Modernization'
+                };
+
+                searchResults.innerHTML = matchingTopics.map(topic => `
+                    <div class="topic-card ${topic.read ? 'read' : ''}" onclick="showTopicDetail(${topic.id})">
+                        <div class="topic-header">
+                            <div class="topic-title">${topic.title}</div>
+                            <div class="topic-badge ${topic.read ? 'read' : ''}">
+                                ${topic.read ? '✓ Read' : 'New'}
+                            </div>
+                        </div>
+                        <div class="topic-summary">${topic.summary}</div>
+                        <div style="color: var(--aws-gray); font-size: 0.8rem; margin-top: 5px;">
+                            ${domainNames[topic.domain]}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        });
 
         // Add topic form
         document.getElementById('add-topic-form').addEventListener('submit', (e) => {
@@ -1120,7 +1363,8 @@
                 domain: document.getElementById('card-domain').value,
                 question: document.getElementById('card-question-input').value,
                 answer: document.getElementById('card-answer-input').value,
-                status: 'new'
+                status: 'new',
+                bookmarked: false
             };
             flashcards.push(newCard);
             saveCards();

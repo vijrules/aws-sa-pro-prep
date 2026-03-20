@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aws-sa-pro-v3';
+const CACHE_NAME = 'aws-sa-pro-v4';
 const urlsToCache = [
   '/aws-sa-pro-prep/',
   '/aws-sa-pro-prep/index.html',
